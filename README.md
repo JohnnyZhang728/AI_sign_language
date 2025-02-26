@@ -56,7 +56,7 @@ Pipeline:  Real-time speech to text to gloss to pose
 
 Input file (poem audio): `poem_audio/New_Orleans_Function.mp3`
 
-(Use another device to play this audio.)
+(Use another device to play this audio to simulate real-time situations.)
 
 Output files: `spoken_to_signed/whisper_streaming/output/pose/`
 
