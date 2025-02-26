@@ -48,6 +48,10 @@ Find your microphone or audio device name and replace `"Microphone (Realtek Audi
 ffmpeg -f dshow -i audio="Microphone (Realtek Audio)" -ar 16000 -ac 1 -f s16le - | nc localhost 43007
 ```
 
+
+
+Using `Control+C`  to qiut the programs
+
 ## Results
 
 Pipeline:  Real-time speech to text to gloss to pose
