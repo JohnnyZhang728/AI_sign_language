@@ -214,9 +214,24 @@ class ServerProcessor:
             gif_filename = f"gif_{self.counter}.gif"  # 对应的 GIF 文件名
             video_filename = f"video_{self.counter}.mp4"
 
-            output_pose_path = f"output/pose/{pose_filename}"
-            gif_path = f"output/gif/{gif_filename}"
-            video_path = f"output/video/{video_filename}"
+            # 文件夹路径
+            output_dir = "output"
+            pose_dir = f"{output_dir}/pose"
+            gif_dir = f"{output_dir}/gif"
+            video_dir = f"{output_dir}/video"
+
+            # 如果这些文件夹不存在，则先创建它们
+            os.makedirs(pose_dir, exist_ok=True)
+            os.makedirs(gif_dir, exist_ok=True)
+            os.makedirs(video_dir, exist_ok=True)
+
+            output_pose_path = f"{pose_dir}/{pose_filename}"
+            gif_path = f"{gif_dir}/{gif_filename}"
+            video_path = f"{video_dir}/{video_filename}"
+
+            # output_pose_path = f"output/pose/{pose_filename}"
+            # gif_path = f"output/gif/{gif_filename}"
+            # video_path = f"output/video/{video_filename}"
 
             # generate_pose(gloss, lexicon_path, output_pose_path)
             # generate_gif(output_pose_path, gif_path)
