@@ -1,6 +1,6 @@
 # AI_sign_language
 
-## Prerequisites
+## Setup
 
 Download the `sgg.zip` file from the **ASL Lexicon Pose files** in the **Releases** section. After extracting the zip file, place the `sgg` folder under the `assets/dummy_lexicon` directory.
 
