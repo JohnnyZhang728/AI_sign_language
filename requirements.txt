@@ -11,6 +11,7 @@ asttokens==2.4.1
 astunparse==1.6.3
 async-lru==2.0.4
 attrs==23.2.0
+audioread==3.0.1
 Babel==2.15.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
@@ -22,9 +23,13 @@ charset-normalizer==3.3.2
 click==8.1.7
 cloudpathlib==0.18.1
 colorama==0.4.6
+colorlog==6.9.0
 comm==0.2.2
 confection==0.1.5
+contourpy==1.3.0
+cycler==0.12.1
 cymem==2.0.8
+Cython==3.0.12
 debugpy==1.8.1
 decorator==5.1.1
 defusedxml==0.7.1
@@ -39,6 +44,7 @@ executing==2.0.1
 fastjsonschema==2.20.0
 filelock==3.14.0
 flatbuffers==24.3.25
+fonttools==4.55.7
 fqdn==1.5.1
 fsspec==2024.6.0
 gast==0.5.4
@@ -49,7 +55,6 @@ h5py==3.11.0
 httpcore==1.0.5
 httpx==0.27.0
 idna==3.7
-# importlib==1.0.4
 importlib_metadata==7.1.0
 importlib_resources==6.4.0
 ipykernel==6.29.4
@@ -58,6 +63,7 @@ ipywidgets==8.1.3
 isoduration==20.11.0
 jedi==0.19.1
 Jinja2==3.1.4
+joblib==1.4.2
 json5==0.9.25
 jsonpointer==3.0.0
 jsonschema==4.22.0
@@ -75,20 +81,27 @@ jupyterlab_pygments==0.3.0
 jupyterlab_server==2.27.2
 jupyterlab_widgets==3.0.11
 keras==3.3.3
+kiwisolver==1.4.7
 langcodes==3.4.0
 LangList==1.1.0
 language_data==1.2.0
+lazy_loader==0.4
 libclang==18.1.1
+librosa==0.10.2.post1
+llvmlite==0.43.0
 lxml==5.2.2
 marisa-trie==1.2.0
 Markdown==3.6
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
+matplotlib==3.9.4
 matplotlib-inline==0.1.7
 mdurl==0.1.2
 mistune==3.0.2
 ml-dtypes==0.3.2
+more-itertools==10.6.0
 mpmath==1.3.0
+msgpack==1.1.0
 murmurhash==1.0.10
 namex==0.0.8
 nbclient==0.10.0
@@ -98,9 +111,12 @@ nest-asyncio==1.6.0
 networkx==3.2.1
 notebook==7.2.1
 notebook_shim==0.2.4
+numba==0.60.0
 numpy==1.26.4
 openai==1.35.7
+openai-whisper @ git+https://github.com/openai/whisper.git@517a43ecd132a2089d85f4ebc044728a71d49f6e
 opencv-python==4.5.5.64
+opencv-python-headless==4.11.0.86
 opt-einsum==3.3.0
 optree==0.11.0
 overrides==7.7.0
@@ -112,6 +128,7 @@ pexpect==4.9.0
 pillow==10.3.0
 pipenv==2024.0.1
 platformdirs==4.2.2
+pooch==1.8.2
 portalocker==2.8.2
 pose_format==0.4.1
 preshed==3.0.9
@@ -122,11 +139,13 @@ protobuf==3.20.3
 psutil==5.9.8
 ptyprocess==0.7.0
 pure-eval==0.2.2
+PyAudio==0.2.14
 pycparser==2.22
 pydantic==2.7.4
 pydantic_core==2.18.4
 Pygments==2.18.0
 pympi-ling==1.70.2
+pyparsing==3.2.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-json-logger==2.0.7
@@ -143,6 +162,7 @@ rfc3986-validator==0.1.1
 rich==13.7.1
 rpds-py==0.18.1
 sacrebleu==2.4.2
+scikit-learn==1.6.1
 scipy==1.13.1
 Send2Trash==1.8.3
 sentencepiece==0.2.0
@@ -153,10 +173,16 @@ six==1.16.0
 smart-open==7.0.4
 sniffio==1.3.1
 sockeye==3.1.34
+socksio==1.0.0
+sounddevice==0.5.1
+soundfile==0.13.1
 soupsieve==2.5
+soxr==0.5.0.post1
 spacy==3.7.5
 spacy-legacy==3.0.12
 spacy-loggers==1.0.5
+SpeechRecognition==3.14.1
+spoken-to-signed @ git+https://github.com/ZurichNLP/spoken-to-signed-translation.git@74ce3d57a49cb49ccc87d0bc708e1ba282ecd19a
 sqlparse==0.5.0
 srsly==2.4.8
 stack-data==0.6.3
@@ -172,6 +198,8 @@ termcolor==2.4.0
 terminado==0.18.1
 tfds-nightly==4.9.3.dev202311230044
 thinc==8.2.5
+threadpoolctl==3.5.0
+tiktoken==0.8.0
 tinycss2==1.3.0
 toml==0.10.2
 tomli==2.0.1
@@ -185,6 +213,7 @@ typing_extensions==4.12.2
 tzdata==2024.1
 uri-template==1.3.0
 urllib3==2.2.1
+vidgear==0.3.3
 virtualenv==20.26.3
 wasabi==1.1.3
 wcwidth==0.2.13
