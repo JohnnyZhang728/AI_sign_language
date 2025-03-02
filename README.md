@@ -10,6 +10,8 @@ Python version: 3.9.21
 pip install -r requirements.txt
 ```
 
+Add the OpenAI API key in `spoken_to_signed/config.py`.
+
 ## Usage
 
 cd `spoken_to_signed/whisper_streaming`
