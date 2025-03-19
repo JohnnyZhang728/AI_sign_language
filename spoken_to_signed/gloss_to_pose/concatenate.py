@@ -52,8 +52,15 @@ def concatenate_poses(poses: List[Pose]) -> Pose:
     print('Scaling pose...')
     new_width = 500
     shift = 1.25
+    # print("pose.body.data.shape[-1]:", pose.body.data.shape[-1])
     shift_vec = np.full(shape=(pose.body.data.shape[-1]), fill_value=shift, dtype=np.float32)
+
+    # print("pose.body.data-BEFORE:", pose.body.data)
     pose.body.data = (pose.body.data + shift_vec) * new_width
     pose.header.dimensions.height = pose.header.dimensions.width = int(new_width * shift * 2)
+
+    ## 替代方案：对 z 轴单独缩放，以保持比例
+    # scale_factors = np.array([new_width, new_width, depth_scaling_factor])
+    # pose.body.data = (pose.body.data + shift_vec) * scale_factors
 
     return pose
