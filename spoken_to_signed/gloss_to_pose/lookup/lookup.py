@@ -100,9 +100,6 @@ class PoseLookup:
         poses: List[Pose] = []
         # print(glosses)
         for i, (word, gloss) in enumerate(glosses):
-            print("word:", word)
-            print("gloss:", gloss)
-
             try:
                 pose = self.lookup(word, gloss, spoken_language, signed_language)
                 poses.append(pose)
