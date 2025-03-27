@@ -8,13 +8,6 @@ from spoken_to_signed.text_to_gloss.types import Gloss
 
 import numpy as np
 
-# eyebrows (Mediapipe Face Mesh)
-LEFT_BROW_POINTS = [19,20,21,23,26,27,28,30,42,43]
-RIGHT_BROW_POINTS = [81,82,83,85,88,89,90,92,104,105]
-
-# RIGHT_BROW_POINTS = [276, 283, 282, 295, 285, 300, 293, 334, 296, 336]
-
-
 
 class PoseLookup:
     def __init__(self, rows: List, directory: str = None):
@@ -100,6 +93,9 @@ class PoseLookup:
         poses: List[Pose] = []
         # print(glosses)
         for i, (word, gloss) in enumerate(glosses):
+            # print("word:", word)
+            # print("gloss:", gloss)
+
             try:
                 pose = self.lookup(word, gloss, spoken_language, signed_language)
                 poses.append(pose)
@@ -109,16 +105,10 @@ class PoseLookup:
                 print(f"No pose found for {word}/{gloss}")
                 pass
 
-            
+            # 如果当前 gloss 是 '?'，则对前一个 pose 进行眉毛调整
             if gloss == '?' and i > 0:
                 if len(poses) > 0:
-                    former_pose = poses[-1]
-                    pose_shape = former_pose.body.data.shape
-                    points_num = pose_shape[2]
-                    # print("points_num:", points_num)
-                    if points_num == 178:
-                        print("raising eyebrows for '?'")
-                        poses[-1] = raise_eyebrows(poses[-1]) 
+                    poses[-1] = raise_eyebrows(poses[-1])
 
 
         if len(poses) == 0:
@@ -128,24 +118,43 @@ class PoseLookup:
 
         return poses
 
+def raise_eyebrows(pose: Pose, raise_amount=5) -> Pose:
 
-def raise_eyebrows(pose: Pose, raise_amount=7, duration=500) -> Pose:
-    
-    frames, people, points, dims = pose.body.data.shape  
-    person_idx = 0  
+    frames, people, points, dims = pose.body.data.shape
+    person_idx = 0
 
-    start_frame = 0
-    end_frame = min(duration, frames - 1)
-    half_duration = min(duration // 2, end_frame - start_frame) 
+    raise_frames = int(frames * 0.6)  # eyebrows raising frames
+    pad_frames = int(frames * 0.13)  # waiting frames before raise eyebrows
 
-    original_positions = pose.body.data[:, person_idx, :, :].copy()
-    raise_frames = min(duration, frames)  # Ensure duration does not exceed available frames
+    rise_phase = int(raise_frames * 0.1)
+    hold_phase = int(raise_frames * 0.8)
+    fall_phase = int(raise_frames * 0.1)
+
+    LEFT_BROW_POINTS = []
+    RIGHT_BROW_POINTS = []
+
+    if points == 178:
+        print("raising eyebrows for '?'")
+
+        LEFT_BROW_POINTS = [19, 20, 21, 23, 26, 27, 28, 30, 42, 43]
+        RIGHT_BROW_POINTS = [81, 82, 83, 85, 88, 89, 90, 92, 104, 105]
+
+    elif points == 576:
+        print("raising eyebrows for '?'")
+
+        LEFT_BROW_POINTS = [79, 85, 86, 88, 96, 98, 99, 103, 138, 140]
+        RIGHT_BROW_POINTS = [309, 315, 316, 318, 326, 328, 329, 333, 367, 369]
 
     for i in range(raise_frames):
-        factor = np.sin((i / raise_frames) * np.pi)  # Smooth raise and fall effect
+        if i < rise_phase:
+            factor = np.sin((i / rise_phase) * (np.pi / 2))
+        elif i < rise_phase + hold_phase:
+            factor = 1
+        else:
+            factor = np.cos(((i - rise_phase - hold_phase) / fall_phase) * (np.pi / 2))
+
         for p in LEFT_BROW_POINTS + RIGHT_BROW_POINTS:
-            pose.body.data[i, person_idx, p, 1] -= factor * raise_amount  # Adjust Y coordinate
-            # print("HERE RAISE EYEBROW")
+            pose.body.data[pad_frames + i, person_idx, p, 1] -= factor * raise_amount
 
     return pose
 
