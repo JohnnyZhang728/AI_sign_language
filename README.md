@@ -16,11 +16,15 @@ Add the OpenAI API key in `spoken_to_signed/config.py`.
 
 cd `spoken_to_signed/whisper_streaming`
 
+Change the `lexicon_path` in `whisper_online_server.py` : `"XXX/XXX/assets/dummy_lexicon"`
+
 ### Server
 
 ```
 python whisper_online_server.py --warmup-file samples_jfk.wav --lan en --backend openai-api
 ```
+
+You can also use `--host` and `--port` to change the *host* and *port*. 
 
 ### Client
 
@@ -74,6 +78,21 @@ Using socket to receive audio streaming and send pose data.
 
 ### Server
 
+Change the `lexicon_path` in `sign_language_server.py` : `"XXX/XXX/assets/dummy_lexicon"`
+
+In `Class ServerProcessor:` , you can set your Unreal Engine IP and the port where UE listens for Pose data. (Port B)
+
+```
+# UE port
+self.UE_HOST = "your-ue-ip" # Unreal Engine IP
+self.UE_PORT = 43008  # The port where UE listens for Pose data
+
+self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+self.socket.connect(("127.0.0.1", self.UE_PORT))  # ((self.UE_HOST, self.UE_PORT))
+```
+
+You can also use `--host` and `--port` to change the host and port for (Audio Streaming) Port A.
+
 ```
 python sign_language_server.py --warmup-file samples_jfk.wav --lan en --backend openai-api
 ```
@@ -86,5 +105,5 @@ python sign_language_server.py --warmup-file samples_jfk.wav --lan en --backend 
 
 
 
-P.S.: Pay attention to the server startup order. First open Port B on the UE, and then start sign_language_server.py.
+P.S.: Pay attention to the server startup order. First open Port B on UE, and then start sign_language_server.py.
 
