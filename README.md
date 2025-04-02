@@ -70,7 +70,7 @@ Using socket to receive audio streaming and send pose data.
 
 ### Workflow
 
-![socket_workflow](figure/socket_workflow.png)
+![socket_workflow](figures/socket_workflow.png)
 
 ### Server
 
