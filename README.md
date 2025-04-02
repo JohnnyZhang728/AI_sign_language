@@ -105,5 +105,5 @@ python sign_language_server.py --warmup-file samples_jfk.wav --lan en --backend 
 
 
 
-P.S.: Pay attention to the server startup order. First open Port B on UE, and then start sign_language_server.py.
+P.S.: Pay attention to the server startup order. First open Port B on UE, and then start `sign_language_server.py`.
 
