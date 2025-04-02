@@ -63,3 +63,28 @@ Input file (poem audio): `poem_audio/New_Orleans_Function.mp3`
 Output files: `spoken_to_signed/whisper_streaming/output/pose/`
 
 **Calculation of Delay Time**: In the Server program's output, locate the `Start_time` (in green text) when the first line of poetry's audio is received. Then, find the `Start_time` (in green text) when the last line of poetry is processed and the next silence audio is received. The difference between these two times represents the program's total processing time (in seconds).
+
+## Two-Channel Server Socket
+
+Using socket to receive audio streaming and send pose data.
+
+### Workflow
+
+![socket_workflow](figure/socket_workflow.png)
+
+### Server
+
+```
+python sign_language_server.py --warmup-file samples_jfk.wav --lan en --backend openai-api
+```
+
+### Client
+
+(Port A: sent audio) For Client Computer Microphone: Same as above.
+
+(Port B: receive pose data) For UE: (Unfinished)
+
+
+
+P.S.: Pay attention to the server startup order. First open Port B on the UE, and then start sign_language_server.py.
+
