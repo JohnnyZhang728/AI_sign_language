@@ -15,7 +15,7 @@ from pose_gif import generate_pose, generate_gif, gpt_gloss, generate_video
 import signal
 
 
-lexicon_path = "/Users/zeyuzhang/TAMU/sign_language/sign_language_procesing/text_to_gloss_pose/assets/dummy_lexicon"
+lexicon_path = "/Users/waitong/PhD/AI_sign_language/assets/dummy_lexicon"
 # output_pose_path = "output/pose/output_pose.pose"
 # gif_path = "output/gif/output_gif.gif"
 # video_path = "output/video/output_video.mp4"
@@ -114,6 +114,8 @@ class ServerProcessor:
         self.is_first = True
 
         self.counter = 0
+
+        self.complete_sentense = ""
 
         # 添加用于捕获 Ctrl+C 的信号处理器
         signal.signal(signal.SIGINT, self.handle_signal)
@@ -246,7 +248,7 @@ class ServerProcessor:
             try:
                 # 尝试执行 generate_pose，捕获潜在的异常
                 generate_pose(gloss, lexicon_path, output_pose_path)
-                # generate_gif(output_pose_path, gif_path)
+                generate_gif(output_pose_path, gif_path)
                 # generate_video(output_pose_path, video_path)
                 pose_end_time = time.time()  # 记录 Pose 完成时间
                 print(f"Pose generation completed in {pose_end_time - pose_start_time:.3f} seconds.")
@@ -280,12 +282,21 @@ class ServerProcessor:
             if a is None:
                 break
             self.online_asr_proc.insert_audio_chunk(a)
+            ready = False
+            if online.is_currently_final:
+                ready = True
             o = online.process_iter()
-            try:
-                self.send_result(o)
-            except BrokenPipeError:
-                logger.info("broken pipe -- connection closed?")
-                break
+            print("o:",o)
+            self.complete_sentense = " ".join([self.complete_sentense, o[2]])
+            if ready:
+                try:
+                    new_o = (o[0], o[1], self.complete_sentense)
+                    print("o:",(self.complete_sentense))
+                    self.send_result(new_o)
+                    self.complete_sentense = ""
+                except BrokenPipeError:
+                    logger.info("broken pipe -- connection closed?")
+                    break
 
         # 记录整个处理过程的结束时间
         end_time = time.time()

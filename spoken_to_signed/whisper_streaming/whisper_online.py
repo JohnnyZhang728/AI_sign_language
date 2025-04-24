@@ -11,7 +11,7 @@ import math
 
 # Usage: python whisper_online.py poem.mp3 --backend openai-api > out.txt
 
-API_KEY='sk-'
+API_KEY=''
 
 logger = logging.getLogger(__name__)
 
@@ -612,6 +612,7 @@ class OnlineASRProcessor:
         Returns: the same format as self.process_iter()
         """
         o = self.transcript_buffer.complete()
+        # print("out", o)
         f = self.to_flush(o)
         logger.debug(f"last, noncommited: {f}")
         self.buffer_time_offset += len(self.audio_buffer)/16000
@@ -678,16 +679,20 @@ class VACOnlineASRProcessor(OnlineASRProcessor):
         res = self.vac(audio)
         self.audio_buffer = np.append(self.audio_buffer, audio)
 
+        print("insert_audio_chunk", res)
         if res is not None:
             frame = list(res.values())[0]-self.buffer_offset
+            print("frame", frame, self.buffer_offset)
             if 'start' in res and 'end' not in res:
                 self.status = 'voice'
                 send_audio = self.audio_buffer[frame:]
+                # send_audio = self.audio_buffer
                 self.online.init(offset=(frame+self.buffer_offset)/self.SAMPLING_RATE)
                 self.online.insert_audio_chunk(send_audio)
                 self.current_online_chunk_buffer_size += len(send_audio)
                 self.clear_buffer()
             elif 'end' in res and 'start' not in res:
+                print("end and we can run the online ASR")
                 self.status = 'nonvoice'
                 send_audio = self.audio_buffer[:frame]
                 self.online.insert_audio_chunk(send_audio)
@@ -718,8 +723,10 @@ class VACOnlineASRProcessor(OnlineASRProcessor):
 
     def process_iter(self):
         if self.is_currently_final:
+            print("finish")
             return self.finish()
         elif self.current_online_chunk_buffer_size > self.SAMPLING_RATE*self.online_chunk_size:
+            print("online update", self.status, self.current_online_chunk_buffer_size, self.SAMPLING_RATE*self.online_chunk_size)
             self.current_online_chunk_buffer_size = 0
             ret = self.online.process_iter()
             return ret
