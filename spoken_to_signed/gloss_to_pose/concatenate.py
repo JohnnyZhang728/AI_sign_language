@@ -40,13 +40,17 @@ def concatenate_poses(poses: List[Pose]) -> Pose:
     print('Trimming poses...')
     poses = [trim_pose(p, i > 0, i < len(poses) - 1) for i, p in enumerate(poses)]
 
+    # raise eyebrow for gloss before '?'
+    # print('Check ? for eyebrow raising...')
+    # poses = raise_eyebrows(poses)
+
     # Concatenate all poses
     print('Smooth concatenating poses...')
     pose = smooth_concatenate_poses(poses)
 
     # Correct the wrists (should be after smoothing)
-    print('Correcting wrists...')
-    pose = correct_wrists(pose)
+    # print('Correcting wrists...')
+    # pose = correct_wrists(pose)
 
     # Scale the newly created pose
     print('Scaling pose...')

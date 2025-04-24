@@ -127,8 +127,13 @@ class ServerProcessor:
         # unblocks if connection is closed or a chunk is available
 
         # record audio start time
-        start_time = time.time()
-        print(f"\033[32mStart_time: {start_time} \033[0m")
+        # start_time = time.time()
+        # print(f"\033[32mStart_time: {start_time} \033[0m")
+
+        audio_start_time = time.time() - self.start_time
+        minutes, seconds = divmod(int(audio_start_time), 60)
+        print(f"\033[32maudio_start_time: {minutes:02d}:{seconds:02d} \033[0m")
+        # print(f"\033[32maudio_start_time: {audio_start_time} \033[0m")
 
         # processing audio receive
         out = []
@@ -146,8 +151,8 @@ class ServerProcessor:
         conc = np.concatenate(out)
 
         # record audio receive end time
-        end_time = time.time()
-        print(f"Audio received in {end_time - start_time:.3f} seconds.")
+        # end_time = time.time()
+        # print(f"Audio received in {end_time - start_time:.3f} seconds.")
 
         if self.is_first and len(conc) < minlimit:
             return None
@@ -197,14 +202,16 @@ class ServerProcessor:
             #     f.write(msg + "\n")
 
             # 也可以打印出来
-            print("Real-time Transcript:", msg)
+            # print("Real-time Transcript:", msg)
+            print(f"\033[32mReal-time_Transcript: {msg} \033[0m")
 
             # Text to Gloss
             gloss_start_time = time.time()  # 记录 Gloss 开始时间
             gloss = gpt_gloss(msg)
             gloss_end_time = time.time()  # 记录 Gloss 完成时间
-            print("Real-time Gloss:", gloss)
-            print(f"Gloss generation completed in {gloss_end_time - gloss_start_time:.3f} seconds.")
+            # print("Real-time Gloss:", gloss)
+            print(f"\033[32mReal-time_Gloss: {gloss} \033[0m")
+            # print(f"Gloss generation completed in {gloss_end_time - gloss_start_time:.3f} seconds.")
 
             # Gloss to Pose
             pose_start_time = time.time()  # 记录 Pose 开始时间
