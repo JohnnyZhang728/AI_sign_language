@@ -133,6 +133,9 @@ def correct_ocr_text(user_input_text):
             - Original text: Indies
             - Translated gloss: fs-INDIES
 
+            - Original text: eden
+            - Translated gloss: fs-EDEN
+
             - Original text: Pontchatrain
             - Translated gloss: fs-PONTCHARTRAIN
 
