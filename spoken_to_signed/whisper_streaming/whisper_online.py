@@ -9,9 +9,17 @@ import io
 import soundfile as sf
 import math
 
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from pose_gif import generate_pose, generate_gif, gpt_gloss, generate_video
+
+import contextlib
+
 # Usage: python whisper_online.py poem.mp3 --backend openai-api > out.txt
 
-API_KEY='sk-'
+OPENAI_API_KEY=''
+
+lexicon_path = "/Users/zeyuzhang/TAMU/sign_language/sign_language_procesing/text_to_gloss_pose/assets/dummy_lexicon"
 
 logger = logging.getLogger(__name__)
 
@@ -291,7 +299,7 @@ class OpenaiApiASR(ASRBase):
 
     def load_model(self, *args, **kwargs):
         from openai import OpenAI
-        self.client = OpenAI(api_key=API_KEY)
+        self.client = OpenAI(api_key=OPENAI_API_KEY)
 
         self.transcribed_seconds = 0  # for logging how many seconds were processed by API, to know the cost
         
@@ -776,9 +784,9 @@ def add_shared_args(parser):
     parser.add_argument('--model', type=str, default='large-v2', choices="tiny.en,tiny,base.en,base,small.en,small,medium.en,medium,large-v1,large-v2,large-v3,large,large-v3-turbo".split(","),help="Name size of the Whisper model to use (default: large-v2). The model is automatically downloaded from the model hub if not present in model cache dir.")
     parser.add_argument('--model_cache_dir', type=str, default=None, help="Overriding the default model cache dir where models downloaded from the hub are saved")
     parser.add_argument('--model_dir', type=str, default=None, help="Dir where Whisper model.bin and other files are saved. This option overrides --model and --model_cache_dir parameter.")
-    parser.add_argument('--lan', '--language', type=str, default='auto', help="Source language code, e.g. en,de,cs, or 'auto' for language detection.")
+    parser.add_argument('--lan', '--language', type=str, default='en', help="Source language code, e.g. en,de,cs, or 'auto' for language detection.")
     parser.add_argument('--task', type=str, default='transcribe', choices=["transcribe","translate"],help="Transcribe or translate.")
-    parser.add_argument('--backend', type=str, default="faster-whisper", choices=["faster-whisper", "whisper_timestamped", "mlx-whisper", "openai-api"],help='Load only this backend for Whisper processing.')
+    parser.add_argument('--backend', type=str, default="openai-api", choices=["faster-whisper", "whisper_timestamped", "mlx-whisper", "openai-api"],help='Load only this backend for Whisper processing.')
     parser.add_argument('--vac', action="store_true", default=False, help='Use VAC = voice activity controller. Recommended. Requires torch.')
     parser.add_argument('--vac-chunk-size', type=float, default=0.04, help='VAC sample size in seconds.')
     parser.add_argument('--vad', action="store_true", default=False, help='Use VAD = voice activity detection, with the default parameters.')
@@ -892,6 +900,8 @@ if __name__ == "__main__":
     beg = args.start_at
     start = time.time()-beg
 
+    counter = 0
+
     def output_transcript(o, now=None):
         # output format in stdout is like:
         # 4186.3606 0 1720 Takhle to je
@@ -899,11 +909,87 @@ if __name__ == "__main__":
         #    - emission time from beginning of processing, in milliseconds
         #    - beg and end timestamp of the text segment, as estimated by Whisper model. The timestamps are not accurate, but they're useful anyway
         # - the next words: segment transcript
+
+        global counter
+
+        clean_output_path = "clean_output.txt"
+
+        def format_time(t):
+            # t 是秒数（浮点数），返回 mm:ss 格式字符串
+            minutes = int(t // 60)
+            seconds = int(t % 60)
+            return f"{minutes:02d}:{seconds:02d}"
+
         if now is None:
             now = time.time()-start
+
         if o[0] is not None:
-            print("%1.4f %1.0f %1.0f %s" % (now*1000, o[0]*1000,o[1]*1000,o[2]),file=logfile,flush=True)
-            print("%1.4f %1.0f %1.0f %s" % (now*1000, o[0]*1000,o[1]*1000,o[2]),flush=True)
+            now_str = format_time(now)
+            start_str = format_time(o[0])
+            end_str = format_time(o[1])
+            transcript = o[2]
+            # output_str = f"{now_str} {start_str} {end_str} {o[2]}"
+            # output_str = f"{start_str} {o[2]}"
+            # print(output_str, file=logfile, flush=True)
+            # print(output_str, flush=True)
+
+            # Text to Gloss
+            gloss = gpt_gloss(transcript)
+
+            # Gloss to Pose
+            # 使用累积计数值生成唯一文件名
+            counter += 1  # 每次生成一个新的 pose 时，计数器加 1
+            pose_filename = f"pose_{counter}.pose"  # 例如，pose_1.pose
+
+            # 文件夹路径
+            output_dir = "output"
+            pose_dir = f"{output_dir}/pose"
+
+            # 如果这些文件夹不存在，则先创建它们
+            os.makedirs(pose_dir, exist_ok=True)
+
+            output_pose_path = f"{pose_dir}/{pose_filename}"
+
+            try:
+                # 尝试执行 generate_pose，捕获潜在的异常
+                generate_pose(gloss, lexicon_path, output_pose_path)
+
+                with open(clean_output_path, "a", encoding="utf-8") as f:
+                    f.write(f"{pose_filename}\n")
+                    f.write(f"start_time: {start_str}\n")
+                    f.write(f"Real-time_Transcript: {transcript}\n")
+                    f.write(f"Real-time_Gloss: {gloss}\n")
+                    f.write("\n")  # 空一行
+
+                # print(f"{pose_filename}", file=logfile, flush=True)
+                # print(f"start_time: {start_str}", file=logfile, flush=True)
+                # print(f"Real-time_Transcript: {transcript}", file=logfile, flush=True)
+                # print(f"Real-time_Gloss: {gloss}", file=logfile, flush=True)
+                # print("", file=logfile, flush=True)  # 输出空行
+                #
+                # print(f"{pose_filename}", flush=True)
+                # print(f"start_time: {start_str}", flush=True)
+                # print(f"Real-time_Transcript: {transcript}", flush=True)
+                # print(f"Real-time_Gloss: {gloss}", flush=True)
+                # print("", flush=True)
+
+            except Exception as e:
+                # 捕获异常并打印警告，跳过当前 msg 的处理
+                print(f"Warning: {e}, skipping this message...")
+                # 跳过当前 msg，继续下一个
+                return
+
+            # print(f"start_time: {start_str}", file=logfile, flush=True)
+            # print(f"Real-time_Transcript: {transcript}", file=logfile, flush=True)
+            # print(f"Real-time_Gloss: {gloss}", file=logfile, flush=True)
+            # print("", file=logfile, flush=True)  # 输出空行
+            # print(f"start_time: {start_str}", flush=True)
+            # print(f"Real-time_Transcript: {transcript}", flush=True)
+            # print(f"Real-time_Gloss: {gloss}", flush=True)
+            # print("", flush=True)
+
+            # print("%1.4f %1.0f %1.0f %s" % (now*1000, o[0]*1000,o[1]*1000,o[2]),file=logfile,flush=True)
+            # print("%1.4f %1.0f %1.0f %s" % (now*1000, o[0]*1000,o[1]*1000,o[2]),flush=True)
         else:
             # No text, so no output
             pass

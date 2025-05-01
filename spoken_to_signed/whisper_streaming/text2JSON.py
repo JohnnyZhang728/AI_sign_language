@@ -15,8 +15,8 @@ def parse_pose_file(file_path):
                 data.append(block)
                 block = {}
             continue
-        if line.endswith('.pose:'):
-            block['pose_name'] = line.replace('.pose:', '')
+        if line.endswith('.pose'):
+            block['pose_name'] = line.replace('.pose', '')
         elif line.startswith('start_time:'):
             block['start_time'] = line.split('start_time:')[1].strip()
         elif line.startswith('Real-time_Transcript:'):
@@ -31,9 +31,9 @@ def parse_pose_file(file_path):
 
 
 # 使用示例
-pose_data = parse_pose_file('block_wrist/new/Afterlight/timestamp.txt')
+pose_data = parse_pose_file('0501/Afterlight/clean_output.txt')
 
-with open('block_wrist/new/Afterlight/timestamp.json', 'w', encoding='utf-8') as out_file:
+with open('0501/Afterlight/timestamp_json/timestamp.json', 'w', encoding='utf-8') as out_file:
     json.dump(pose_data, out_file, indent=2, ensure_ascii=False)
 
 print("✅ JSON 文件已生成：output.json")
